@@ -81,6 +81,37 @@ Anda dapat mengubah kredensial tersebut melalui halaman profil setelah login.
 - **Pengguna**: Akses beranda (`/`), pilih jenis sampah, masukkan berat, lalu tekan *Hitung Total*. Ringkasan hasil dan rekomendasi akan muncul di sisi kanan.
 - **Admin**: Login melalui `/login`, lalu buka menu *Jenis Sampah* untuk mengelola data. Unggah foto, atur harga, dan aktif/nonaktifkan jenis sesuai kebutuhan.
 
+## 📋 Panduan Detail Fitur Admin
+
+### 1. Manajemen Jenis Sampah
+- Akses halaman `Dashboard > Jenis Sampah` setelah login sebagai admin.
+- Gunakan kolom pencarian untuk memfilter berdasarkan nama atau deskripsi.
+- Tombol **Jenis Baru** membuka formulir penambahan lengkap dengan unggah foto.
+- Saat mengedit:
+  - Harga otomatis diformat 2 angka desimal.
+  - Foto lama akan diganti jika Anda mengunggah file baru.
+  - Opsi *Tampilkan di kalkulator pengguna* mengatur status aktif.
+- Tombol **Hapus** memunculkan konfirmasi (Livewire Alert) sebelum data benar‑benar dihapus.
+
+### 2. Upload & Penyimpanan Foto
+- File disimpan di `storage/app/public/waste-types` dan diakses via `Storage::url`.
+- Jalankan `php artisan storage:link` sekali agar gambar tersedia di publik.
+- Format yang diterima: `jpg`, `jpeg`, `png`, `webp` dengan ukuran maksimum 2 MB.
+
+### 3. Navigasi & Akses
+- Middleware `auth`, `verified`, dan `admin` melindungi semua rute admin.
+- Pengguna non-admin yang mencoba mengakses halaman admin akan mendapatkan status HTTP 403.
+- Navigasi Livewire otomatis menampilkan link *Jenis Sampah* hanya untuk admin.
+
+## 🧮 Alur Kerja Kalkulator Pengguna
+
+1. Komponen Livewire `WasteCalculator` tampil di beranda.
+2. Data jenis sampah diambil dari tabel `waste_types` (hanya yang aktif) dan di-cache di properti komponen.
+3. Pengguna dapat menambah baris entri tanpa batas:
+   - Field berat hanya menerima angka positif (0.1 hingga 1000 kg).
+   - Total dihitung otomatis setiap kali entri berubah.
+4. Panel samping menampilkan ringkasan serta rekomendasi tiga jenis dengan harga tertinggi yang belum dipilih.
+
 ## 🧪 Pengujian
 
 Jalankan seluruh test menggunakan perintah:
@@ -88,6 +119,8 @@ Jalankan seluruh test menggunakan perintah:
 ```bash
 php artisan test
 ```
+
+> **Catatan:** PHPUnit bawaan menggunakan koneksi SQLite in-memory. Pastikan ekstensi `pdo_sqlite` aktif di PHP lokal, atau konfigurasi `phpunit.xml` agar menggunakan koneksi MySQL jika ekstensi tersebut tidak tersedia.
 
 ## 📄 Lisensi
 

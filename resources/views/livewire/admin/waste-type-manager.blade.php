@@ -1,9 +1,5 @@
-@php
-    use Illuminate\Support\Facades\Storage;
-@endphp
-
 <div class="py-10">
-    <div class="mx-auto flex w-full max-w-8xl flex-col gap-7 px-4 sm:px-7 lg:flex-row lg:px-9">
+    <div class="mx-auto flex w-full max-w-8xl flex-col gap-7 px-4 sm:px-7 lg:flex-row lg:items-start lg:px-9">
         <section class="flex-1 rounded-3xl border border-emerald-100 bg-white p-6 shadow-sm">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -14,10 +10,10 @@
                     <div class="relative">
                         <svg class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-emerald-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 3.473 9.776l3.125 3.126a.75.75 0 1 0 1.06-1.06l-3.125-3.126A5.5 5.5 0 0 0 9 3.5ZM5.5 9a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0Z" clip-rule="evenodd" />
-                        </svg>
+                        </svg>  
                         <input
                             type="search"
-                            wire:model.debounce.400ms="search"
+                            wire:model.live.debounce.400ms="search"
                             placeholder="Cari jenis sampah..."
                             class="w-full rounded-xl border border-emerald-200 bg-white pl-9 pr-3 py-2 text-sm text-emerald-900 shadow-inner focus:border-emerald-500 focus:ring-emerald-500"
                         />
@@ -31,109 +27,74 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
                             <path d="M10 3a1 1 0 0 1 1 1v5h5a1 1 0 1 1 0 2h-5v5a1 1 0 1 1-2 0v-5H4a1 1 0 1 1 0-2h5V4a1 1 0 0 1 1-1Z" />
                         </svg>
-                        Jenis baru
+                        Tambah
                     </button>
                 </div>
             </div>
 
-            <div class="mt-6 overflow-hidden rounded-2xl border border-emerald-100">
-                <table class="min-w-full divide-y divide-emerald-100 text-sm text-emerald-900">
-                    <thead class="bg-emerald-50/80 text-xs uppercase tracking-wide text-emerald-600">
-                        <tr>
-                            <th class="px-4 py-3 text-left">
-                                <button type="button" wire:click="sortBy('name')" class="flex items-center gap-1 font-semibold">
-                                    Jenis Sampah
-                                    @if ($sortField === 'name')
-                                        <svg class="size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" class="{{ $sortDirection === 'asc' ? 'rotate-180' : '' }} transition" />
-                                        </svg>
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="px-4 py-3 text-left">
-                                <button type="button" wire:click="sortBy('price_per_kg')" class="flex items-center gap-1 font-semibold">
-                                    Harga / Kg
-                                    @if ($sortField === 'price_per_kg')
-                                        <svg class="size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" class="{{ $sortDirection === 'asc' ? 'rotate-180' : '' }} transition" />
-                                        </svg>
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="px-4 py-3 text-left">Status</th>
-                            <th class="px-4 py-3 text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-emerald-50 bg-white">
-                        @forelse ($wasteTypes as $type)
-                            <tr wire:key="type-{{ $type->id }}" class="transition hover:bg-emerald-50/40">
-                                <td class="px-4 py-4">
-                                    <div class="flex items-start gap-4">
-                                        @php
-                                            $initial = mb_substr($type->name, 0, 1);
-                                        @endphp
-                                        <div class="relative">
-                                            @if ($type->image_path)
-                                                <img src="{{ Storage::url($type->image_path) }}" alt="{{ $type->name }}" class="size-14 rounded-xl object-cover shadow-inner" />
-                                            @else
-                                                <div class="flex size-14 items-center justify-center rounded-xl bg-emerald-100 text-lg font-semibold text-emerald-700 shadow-inner">{{ $initial }}</div>
-                                            @endif
-                                        </div>
-                                        <div class="space-y-1">
-                                            <p class="font-semibold text-emerald-900">{{ $type->name }}</p>
-                                            @if ($type->description)
-                                                <p class="text-xs text-emerald-600">{{ $type->description }}</p>
-                                            @endif
-                                            <p class="text-xs text-emerald-500">Slug: {{ $type->slug }}</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-4">
-                                    <div class="font-semibold text-emerald-900">Rp{{ number_format($type->price_per_kg, 0, ',', '.') }}</div>
-                                </td>
-                                <td class="px-4 py-4">
+            <div class="mt-6 space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 xl:grid-cols-2 sm:gap-4">
+                @forelse ($wasteTypes as $type)
+                    <article wire:key="type-{{ $type->id }}" class="flex h-full flex-col rounded-2xl border border-emerald-100 bg-white/90 p-4 shadow-sm transition hover:shadow-md">
+                        <div class="flex items-start gap-4">
+                            <div class="relative shrink-0">
+                                @if ($type->image_path)
+                                    <img src="{{ Storage::url($type->image_path) }}" alt="{{ $type->name }}" class="size-12 rounded-xl object-cover shadow-inner" />
+                                @else
+                                    <div class="flex size-12 items-center justify-center rounded-xl bg-emerald-100 text-base font-semibold text-emerald-700 shadow-inner">{{ mb_substr($type->name, 0, 1) }}</div>
+                                @endif
+                            </div>
+
+                            <div class="flex-1 space-y-1">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <p class="font-semibold text-emerald-900">{{ $type->name }}</p>
                                     <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold {{ $type->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500' }}">
                                         <span class="size-2 rounded-full {{ $type->is_active ? 'bg-emerald-500' : 'bg-gray-400' }}"></span>
                                         {{ $type->is_active ? 'Aktif' : 'Nonaktif' }}
                                     </span>
-                                </td>
-                                <td class="px-4 py-4">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <button
-                                            type="button"
-                                            wire:click="toggleStatus({{ $type->id }})"
-                                            wire:loading.attr="disabled"
-                                            wire:target="toggleStatus({{ $type->id }})"
-                                            class="inline-flex items-center gap-1 rounded-lg border border-emerald-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-50"
-                                        >
-                                            {{ $type->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            wire:click="edit({{ $type->id }})"
-                                            class="inline-flex items-center gap-1 rounded-lg border border-emerald-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-50"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            type="button"
-                                            wire:click="confirmDelete({{ $type->id }})"
-                                            class="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50"
-                                        >
-                                            Hapus
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="px-4 py-12 text-center text-sm text-emerald-600">
-                                    Belum ada jenis sampah yang terdaftar. Tambahkan jenis baru untuk mulai menggunakan kalkulator.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                </div>
+                                <p class="text-sm font-semibold text-emerald-800">Rp{{ number_format($type->price_per_kg, 0, ',', '.') }}/kg</p>
+                                @if ($type->description)
+                                    <p class="text-xs text-emerald-600">
+                                        {{ $type->description }}
+                                    </p>
+                                @endif
+                                <p class="text-xs text-emerald-400">Slug: {{ $type->slug }}</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                            <button
+                                type="button"
+                                wire:click="toggleStatus({{ $type->id }})"
+                                wire:loading.attr="disabled"
+                                wire:target="toggleStatus({{ $type->id }})"
+                                class="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-emerald-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-50"
+                            >
+                                {{ $type->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                            </button>
+
+                            <button
+                                type="button"
+                                wire:click="edit({{ $type->id }})"
+                                class="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-emerald-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-50"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                type="button"
+                                wire:click="confirmDelete({{ $type->id }})"
+                                class="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50"
+                            >
+                                Hapus
+                            </button>
+                        </div>
+                    </article>
+                @empty
+                    <p class="rounded-2xl border border-dashed border-emerald-200 bg-white/80 p-6 text-center text-sm text-emerald-600">
+                        Belum ada jenis sampah yang terdaftar. Tambahkan jenis baru untuk mulai menggunakan kalkulator.
+                    </p>
+                @endforelse
             </div>
 
             <div class="mt-4">
@@ -141,7 +102,7 @@
             </div>
         </section>
 
-        <aside class="w-full max-w-xl rounded-3xl border border-emerald-100 bg-white p-6 shadow-sm lg:sticky lg:top-24">
+        <aside class="w-full max-w-xl rounded-3xl border border-emerald-100 bg-white p-6 shadow-sm lg:sticky lg:top-24 lg:self-start">
             <header class="border-b border-emerald-100 pb-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-emerald-500">{{ $editingId ? 'Perbarui' : 'Tambah' }} Jenis Sampah</p>
                 <h2 class="mt-1 text-xl font-semibold text-emerald-900">{{ $editingId ? 'Edit Data Jenis Sampah' : 'Buat Jenis Sampah Baru' }}</h2>

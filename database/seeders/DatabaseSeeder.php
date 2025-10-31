@@ -21,16 +21,7 @@ class DatabaseSeeder extends Seeder
                 'is_admin' => true,
             ]
         );
-
-        User::firstOrCreate(
-            ['email' => 'user@banksampah.test'],
-            [
-                'name' => 'User',
-                'password' => Hash::make('password'),
-                'is_admin' => false,
-            ]
-        );
-
+        
         $this->call([
             WasteTypeSeeder::class,
         ]);

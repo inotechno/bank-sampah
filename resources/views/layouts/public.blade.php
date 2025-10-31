@@ -30,7 +30,6 @@
                     </nav>
 
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('login') }}" wire:navigate class="hidden rounded-xl border border-emerald-200 px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-50 sm:inline-flex">Masuk Admin</a>
                         <a href="{{ route('login') }}" wire:navigate class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
                                 <path fill-rule="evenodd" d="M3.5 1A1.5 1.5 0 0 0 2 2.5v15A1.5 1.5 0 0 0 3.5 19h7.75a.75.75 0 0 0 0-1.5H3.5a.5.5 0 0 1-.5-.5v-15a.5.5 0 0 1 .5-.5h7.75a.75.75 0 0 0 0-1.5H3.5Zm9 4.25a.75.75 0 0 1 .75-.75h2.5A2.25 2.25 0 0 1 18 6.75v10.5A2.25 2.25 0 0 1 15.75 19h-2.5a.75.75 0 0 1 0-1.5h2.5c.414 0 .75-.336.75-.75V6.75a.75.75 0 0 0-.75-.75h-2.5a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />

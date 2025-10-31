@@ -12,13 +12,6 @@
             @endif
         </div>
     </x-slot>
-
-    @php
-        $totalWasteTypes = \App\Models\WasteType::count();
-        $activeWasteTypes = \App\Models\WasteType::where('is_active', true)->count();
-        $averagePrice = \App\Models\WasteType::avg('price_per_kg');
-    @endphp
-
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid gap-6 lg:grid-cols-3">
             <article class="rounded-3xl border border-emerald-100 bg-white p-6 shadow-sm">

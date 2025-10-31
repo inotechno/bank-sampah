@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Livewire\Admin\WasteTypeManager;
 use App\Livewire\WasteCalculator;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', WasteCalculator::class)->name('home');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
