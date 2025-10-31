@@ -19,84 +19,99 @@
 
             <div class="mt-8 space-y-6">
                 @forelse ($entries as $index => $entry)
-                    <article wire:key="entry-{{ $index }}"
-                        class="rounded-2xl border border-emerald-100 bg-white/90 p-5 shadow-sm ring-1 ring-transparent transition hover:shadow-md hover:ring-emerald-200">
-                        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                            <div class="w-full sm:w-1/2">
-                                <label for="waste-type-{{ $index }}" class="text-sm font-medium text-emerald-900">Jenis
-                                    Sampah</label>
-                                <div class="mt-1">
-                                    <select id="waste-type-{{ $index }}"
+                    <article wire:key="entry-{{ $index }}" class="rounded-3xl border border-emerald-100 bg-white/95 p-6 shadow-sm ring-1 ring-transparent transition hover:shadow-lg hover:ring-emerald-200">
+                        <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                            <div class="relative shrink-0">
+                                @if ($entry['waste_type_id'] && ($preview = $wasteTypes->firstWhere('id', $entry['waste_type_id'])))
+                                    @if ($preview->image_path)
+                                        <img src="{{ Storage::url($preview->image_path) }}" alt="{{ $preview->name }}" class="size-12 rounded-xl object-cover shadow-inner" />
+                                    @else
+                                        <div class="flex size-12 items-center justify-center rounded-xl bg-emerald-100 text-lg font-semibold text-emerald-700 shadow-inner">
+                                            {{ mb_strtoupper(mb_substr($preview->name, 0, 1)) }}
+                                        </div>
+                                    @endif
+                                @else
+                                    <div class="flex size-12 items-center justify-center rounded-xl bg-emerald-50 text-lg font-semibold text-emerald-400 shadow-inner">
+                                        ?
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="grid flex-1 gap-3 sm:grid-cols-2">
+                                <div class="space-y-2 sm:col-span-1">
+                                    <p class="text-xs font-semibold uppercase tracking-wide text-emerald-500">Jenis Sampah</p>
+                                    <select
+                                        id="waste-type-{{ $index }}"
                                         wire:model.live="entries.{{ $index }}.waste_type_id"
-                                        class="block w-full rounded-xl border-emerald-200 bg-white px-4 py-2.5 text-sm text-emerald-900 shadow-inner focus:border-emerald-500 focus:ring-emerald-500">
+                                        class="w-full mt-2 rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-emerald-900 shadow-inner focus:border-emerald-500 focus:ring-emerald-500"
+                                    >
                                         <option value="">Pilih jenis sampah</option>
                                         @foreach ($wasteTypes as $type)
-                                            <option value="{{ $type->id }}">{{ $type->name }} —
-                                                Rp{{ number_format($type->price_per_kg, 0, ',', '.') }}/kg</option>
+                                            <option value="{{ $type->id }}">{{ $type->name }} — Rp{{ number_format($type->price_per_kg, 0, ',', '.') }}/kg</option>
                                         @endforeach
                                     </select>
-                                    @error('entries.' . $index . '.waste_type_id')
-                                        <p class="mt-2 text-xs text-red-600">{{ $message }}</p>
+                                    @error('entries.'.$index.'.waste_type_id')
+                                        <p class="text-xs text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="space-y-2 sm:col-span-1">
+                                    <p class="text-xs font-semibold uppercase tracking-wide text-emerald-500">Berat Sampah</p>
+                                    <div class="flex items-center gap-2 mt-2 rounded-2xl border border-emerald-200 bg-white px-3 py-1 shadow-inner focus-within:border-emerald-500">
+                                        <input
+                                            id="weight-{{ $index }}"
+                                            type="number"
+                                            min="0"
+                                            step="0.1"
+                                            wire:model.live="entries.{{ $index }}.weight"
+                                            class="w-full border-0 bg-transparent text-center text-sm font-semibold text-emerald-900 focus:ring-0"
+                                            placeholder="0,0"
+                                        />
+                                        <span class="text-xs font-semibold uppercase tracking-wide text-emerald-500">kg</span>
+                                    </div>
+                                    @error('entries.'.$index.'.weight')
+                                        <p class="text-xs text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
                             </div>
 
-                            <div class="w-full sm:w-1/3">
-                                <label for="weight-{{ $index }}" class="text-sm font-medium text-emerald-900">Berat Sampah
-                                    (kg)</label>
-                                <div class="mt-1 relative">
-                                    <input id="weight-{{ $index }}" type="number" min="0" step="0.1"
-                                        wire:model.live="entries.{{ $index }}.weight"
-                                        class="block w-full rounded-xl border-emerald-200 bg-white px-4 py-2.5 pr-16 text-sm text-emerald-900 shadow-inner focus:border-emerald-500 focus:ring-emerald-500"
-                                        placeholder="0,0" />
-                                    <span
-                                        class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-xs font-semibold uppercase tracking-wide text-emerald-500">kg</span>
-                                </div>
-                                @error('entries.' . $index . '.weight')
-                                    <p class="mt-2 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="flex w-full items-start justify-end sm:w-auto">
-                                <button type="button" wire:click="removeEntry({{ $index }})"
-                                    class="inline-flex items-center gap-2 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 transition hover:border-red-200 hover:bg-red-100 disabled:cursor-not-allowed disabled:border-gray-100 disabled:bg-gray-50 disabled:text-gray-400"
-                                    @disabled(count($entries) <= 1)>
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                        class="size-4">
-                                        <path fill-rule="evenodd"
-                                            d="M5.5 5A1.5 1.5 0 0 0 4 6.5v9A1.5 1.5 0 0 0 5.5 17h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 5h-9ZM8 8a.75.75 0 0 1 .75.75V13a.75.75 0 0 1-1.5 0V8.75A.75.75 0 0 1 8 8Zm3.25 0a.75.75 0 0 1 .75.75V13a.75.75 0 0 1-1.5 0V8.75A.75.75 0 0 1 11.25 8ZM7 3.5A1.5 1.5 0 0 1 8.5 2h3A1.5 1.5 0 0 1 13 3.5v.5h2.5a.75.75 0 0 1 0 1.5h-11a.75.75 0 0 1 0-1.5H7v-.5Z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                    Hapus
-                                </button>
-                            </div>
-                        </div>
+                            <button
+                                type="button"
+                                wire:click="removeEntry({{ $index }})"
+                                class="inline-flex items-center justify-center gap-2 self-start rounded-2xl border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:border-red-200 hover:bg-red-100 disabled:cursor-not-allowed disabled:border-gray-100 disabled:bg-gray-50 disabled:text-gray-400"
+                                @disabled(count($entries) <= 1)
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+                                    <path fill-rule="evenodd" d="M5.5 5A1.5 1.5 0 0 0 4 6.5v9A1.5 1.5 0 0 0 5.5 17h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 5h-9ZM8 8a.75.75 0 0 1 .75.75V13a.75.75 0 0 1-1.5 0V8.75A.75.75 0 0 1 8 8Zm3.25 0a.75.75 0 0 1 .75.75V13a.75.75 0 0 1-1.5 0V8.75A.75.75 0 0 1 11.25 8ZM7 3.5A1.5 1.5 0 0 1 8.5 2h3A1.5 1.5 0 0 1 13 3.5v.5h2.5a.75.75 0 0 1 0 1.5h-11a.75.75 0 0 1 0-1.5H7v-.5Z" clip-rule="evenodd" />
+                                </svg>
+                                Hapus
+                            </button>
 
                         @if ($selectedType = $wasteTypes->firstWhere('id', $entry['waste_type_id'] ?? null))
-                            <dl class="mt-4 grid grid-cols-1 gap-3 text-sm text-emerald-800 sm:grid-cols-2">
-                                <div class="rounded-xl bg-emerald-50/70 px-3 py-2">
-                                    <dt class="text-xs font-semibold uppercase tracking-wide text-emerald-500">Harga per
-                                        kilogram</dt>
-                                    <dd class="mt-1 text-base font-semibold text-emerald-900">
-                                        Rp{{ number_format($selectedType->price_per_kg, 0, ',', '.') }}</dd>
-                                </div>
-                                <div class="rounded-xl bg-emerald-50/70 px-3 py-2">
-                                    <dt class="text-xs font-semibold uppercase tracking-wide text-emerald-500">Subtotal</dt>
-                                    <dd class="mt-1 text-base font-semibold text-emerald-900">
-                                        @if(!empty($entry['weight']))
-                                            Rp{{ number_format($selectedType->price_per_kg * (float) $entry['weight'], 0, ',', '.') }}
-                                        @else
-                                            —
-                                        @endif
-                                    </dd>
-                                </div>
-                                @if ($selectedType->description)
-                                    <div
-                                        class="sm:col-span-2 rounded-xl border border-emerald-100 bg-white px-3 py-2 text-xs text-emerald-700">
-                                        {{ $selectedType->description }}
+                            <div class="mt-6 space-y-4">
+                                <dl class="grid gap-4 sm:grid-cols-2">
+                                    <div class="rounded-2xl border border-emerald-100 bg-emerald-50/70 px-4 py-3">
+                                        <dt class="text-xs font-semibold uppercase tracking-wide text-emerald-500">Harga per kilogram</dt>
+                                        <dd class="mt-1 text-lg font-semibold text-emerald-900">Rp{{ number_format($selectedType->price_per_kg, 0, ',', '.') }}</dd>
                                     </div>
+                                    <div class="rounded-2xl border border-emerald-100 bg-emerald-50/70 px-4 py-3">
+                                        <dt class="text-xs font-semibold uppercase tracking-wide text-emerald-500">Subtotal</dt>
+                                        <dd class="mt-1 text-lg font-semibold text-emerald-900">
+                                            @if(! empty($entry['weight']))
+                                                Rp{{ number_format($selectedType->price_per_kg * (float) $entry['weight'], 0, ',', '.') }}
+                                            @else
+                                                —
+                                            @endif
+                                        </dd>
+                                    </div>
+                                </dl>
+
+                                @if ($selectedType->description)
+                                    <p class="rounded-2xl border border-emerald-100 bg-white px-4 py-3 text-xs text-emerald-700">
+                                        {{ $selectedType->description }}
+                                    </p>
                                 @endif
-                            </dl>
+                            </div>
                         @endif
                     </article>
                 @empty
